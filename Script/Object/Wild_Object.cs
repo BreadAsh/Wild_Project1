@@ -24,12 +24,26 @@ public class Wild_Object
 
 	public int Wild_GetNumber() { return m_number; }
 
+	public GameObject Wild_GetModel() { return m_model; }
+
 	/********** Method	**********/
 
 	/********** Default Method	**********/
-	public virtual void Wild_Init(string _str)
+	public virtual void Wild_Init(GameObject _parent, string _str, Wild_Object_TYPE _type)
 	{
+		if(_parent != null)
+		{
+			m_model.transform.parent = _parent.transform;
+			m_model.transform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
+			m_model.transform.localPosition = new Vector3(0.0f, 0.0f, 0.0f);
+		}
+		if(_str != null)
+		{
+			GameObject model = Object.Instantiate(Resources.Load<GameObject>(_str));
+		}
+		m_type = _type;
 
+		m_AStar_a_data = null;
 	}
 
 	public virtual void Wild_Release()
@@ -41,4 +55,33 @@ public class Wild_Object
 	{
 
 	}
+
+	#region AStar
+    public enum Wild_AStar_CONDITION
+    {
+        NOSEARCH,
+        MOVE,
+        OBJECT,
+        OWN,
+        PLAYER,
+        ALLAIS,
+        ENEMY,
+        NOTMOVE
+    }
+
+    public struct Wild_AStar_Data
+    {
+        public int m_distance;
+
+        public Wild_AStar_CONDITION m_condition;
+    }
+    protected Wild_AStar_Data[] m_AStar_a_data;
+
+	/********** Getter & Setter	**********/
+	public int Wild_AStar_Distance(int _num) { return m_AStar_a_data[_num].m_distance; }
+
+	/********** Method	**********/
+
+	/********** Default Method	**********/
+	#endregion
 }

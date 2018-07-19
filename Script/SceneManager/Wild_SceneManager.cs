@@ -2,15 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-enum Touch_TYPE
+public enum Touch_TYPE
 {
-	Touch_TYPE_Not,
+	NOT,
 
 	// UI
-	Touch_TYPE_Button,
+	BUTTON,
 
 	// Object
-	Touch_TYPE_TILE,
+	TILE,
 }
 
 // TODO: 씬매니저들이 공동으로 상속받는 클래스. 상속받은 클래스는 카메라에 넣어서 쓰세요~
@@ -20,12 +20,16 @@ public class Wild_SceneManager : MonoBehaviour
 	protected List<Wild_UI_Manager> m_l_UIManager;
 	protected int m_selUICount;
 
-	static Touch_TYPE m_inputType;
-	static int m_inputCount;
-	static bool m_isInputOn;
+	private static Touch_TYPE g_inputType;
+	private static int g_inputCount;
+	private static bool g_isInputOn;
+	private static Vector3 g_beganPosition;
+
+	/********** Getter & Setter	**********/
+	public static Touch_TYPE Wild_S_GetInputType(){ return g_inputType; }
 
 	/********** Method	**********/
-	bool Wild_ScreenInput(TouchPhase _phase)
+	public bool Wild_ScreenInput(TouchPhase _phase)
 	{
 		bool res = false;
 
@@ -45,8 +49,9 @@ public class Wild_SceneManager : MonoBehaviour
 
 	void Wild_InputReset()
 	{
-		m_inputCount = -1;
-		m_isInputOn = false;
+		g_inputCount = -1;
+		g_inputType = Touch_TYPE.NOT;
+		g_isInputOn = false;
 	}
 
 	//
@@ -79,6 +84,20 @@ public class Wild_SceneManager : MonoBehaviour
 		m_l_UIManager[m_selUICount].Wild_On();
 	}
 
+	public Vector3 Wild_TouchPosition()
+	{
+		Vector3 res = new Vector3(0, 0, 0);
+		#if UNITY_EDITOR
+		res = Input.mousePosition;
+		#elif UNITY_IOS || UNITY_ANDROID
+		res.x = Input.GetTouch(0).position.x;
+		res.y = Input.GetTouch(0).position.y;
+		res.z = 0;
+		#endif
+
+		return res;
+	}
+
 	/********** Default Method	**********/
 	protected virtual void Wild_Init()
 	{
@@ -103,27 +122,28 @@ public class Wild_SceneManager : MonoBehaviour
 		}
 		else if(Wild_ScreenInput(TouchPhase.Moved))
 		{
-			m_isInputOn = false;
+			g_isInputOn = false;
 			
 			GameObject obj = Wild_Update_Raycast();
-			if((obj != null) && obj.tag.Equals("UIButton"))
+			if(obj != null)
 			{
 				Wild_Update_Moved(obj);
 			}
 
-			if(!m_isInputOn)
+			// 선택한 객체의 범위에서 벗어나면 해당 객체를 초기화
+			if(!g_isInputOn)
 			{
-				switch(m_inputType)
+				switch(g_inputType)
 				{
-					case Touch_TYPE.Touch_TYPE_Button:
-						m_l_UIManager[m_selUICount].Wild_FindBtn(m_inputCount).Wild_Tex_Idle();
+					case Touch_TYPE.BUTTON:
+						m_l_UIManager[m_selUICount].Wild_FindBtn(g_inputCount).Wild_Tex_Idle();
 						break;
 				}
 			}
 		}
 		else if(Wild_ScreenInput(TouchPhase.Ended))
 		{
-			if(m_isInputOn)
+			if(g_isInputOn)
 			{
 				Wild_Update_Ended();
 			}
@@ -132,35 +152,70 @@ public class Wild_SceneManager : MonoBehaviour
 
 		m_l_UIManager[m_selUICount].Wild_Update();
 	}
+
+	//
 	protected virtual void Wild_Update_Began(GameObject _obj)
 	{
-		if(_obj.tag.Equals("UIButton"))
+		switch(_obj.tag)
 		{
-			m_inputType = Touch_TYPE.Touch_TYPE_Button;
+			case "UIButton":
+				{
+					g_inputType = Touch_TYPE.BUTTON;
 
-			m_inputCount = int.Parse(_obj.name);
+					g_inputCount = int.Parse(_obj.name);
+				}
+				break;
+			case "Map":
+				{
+					g_inputType = Touch_TYPE.TILE;
+
+					g_inputCount = int.Parse(_obj.transform.name);
+				}
+				break;
 		}
+
+		g_beganPosition = Wild_TouchPosition();
 	}
 
+	//
 	protected virtual void Wild_Update_Moved(GameObject _obj)
 	{
-		if(_obj.tag.Equals("UIButton"))
+		switch(_obj.tag)
 		{
-			if((m_inputType == Touch_TYPE.Touch_TYPE_Button) && (m_inputCount == int.Parse(_obj.name)))
-			{
-				m_isInputOn = true;
-				m_l_UIManager[m_selUICount].Wild_FindBtn(m_inputCount).Wild_Tex_OnTouch();
-			}
+			case "UIButton":
+				if((g_inputType == Touch_TYPE.BUTTON) && (g_inputCount == int.Parse(_obj.name)))
+				{
+					g_isInputOn = true;
+					m_l_UIManager[m_selUICount].Wild_FindBtn(g_inputCount).Wild_Tex_OnTouch();
+				}
+				break;
+			case "Map":
+				{
+					if((g_inputType == Touch_TYPE.TILE))
+					{
+						Wild_Update_Moved_RangeCheck();
+					}
+				}
+				break;
 		}
 	}
 
+	void Wild_Update_Moved_RangeCheck()
+	{
+		if(Vector3.Distance(g_beganPosition, Wild_TouchPosition()) > 10.0f)
+		{
+			Wild_InputReset();
+		}
+	}
+
+	//
 	protected virtual void Wild_Update_Ended()
 	{
-		switch(m_inputType)
+		switch(g_inputType)
 		{
-			case Touch_TYPE.Touch_TYPE_Button:
-				m_l_UIManager[m_selUICount].Wild_FindBtn(m_inputCount).Wild_Tex_Idle();
-				m_l_UIManager[m_selUICount].Wild_FindBtn(m_inputCount).Wild_Click();
+			case Touch_TYPE.BUTTON:
+				m_l_UIManager[m_selUICount].Wild_FindBtn(g_inputCount).Wild_Tex_Idle();
+				m_l_UIManager[m_selUICount].Wild_FindBtn(g_inputCount).Wild_Click();
 				break;
 		}
 	}
@@ -180,9 +235,18 @@ public class Wild_SceneManager : MonoBehaviour
 		return res;
 	}
 
+	#region Touch
+
+	/********** Getter & Setter	**********/
+
+	/********** Method	**********/
+
+	/********** Default Method	**********/
+	#endregion
+
 	/********** Unity Method	**********/
 	// Use this for initialization
-	void Start ()
+	void Awake ()
 	{
 		Wild_Init();
 	}

@@ -46,11 +46,13 @@ public class Wild_Dungeon_Room
 
 	/********** Default Method	**********/
 	// Wild_Init
-	public void Wild_Init(Transform _map, int _dugeonX, int _number, string _str)
+	public void Wild_Init(Wild_Dungeon_Manager _c_manager, int _dugeonX, int _number, string _str)
 	{
 		m_basic = Object.Instantiate(Resources.Load<GameObject>("Basic"));
 		m_basic.name = "room_" + _number;
-		m_basic.transform.parent = _map;
+		m_basic.transform.parent = _c_manager.Wild_Tile_GetBasic().transform;
+		m_basic.transform.localPosition = new Vector3(0.0f, 0.0f, 0.0f);
+		m_basic.transform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
 		m_basic.SetActive(false);
 
 		//
@@ -68,7 +70,7 @@ public class Wild_Dungeon_Room
 			case "BATTLE":	m_type = Wild_Dungeon_UI.Battle;	break;
 		}
 		Wild_Init_Move(strs[2]);
-		Wild_Init_Monster(strs[3]);
+		Wild_Init_Monster(_c_manager, strs[3]);
 		/*
 		Wild_Init_Item(strs[5]);
 		Wild_Init_Map(strs[7]);
@@ -88,15 +90,21 @@ public class Wild_Dungeon_Room
 		}
 	}
 
-	void Wild_Init_Monster(string _str)
+	void Wild_Init_Monster(Wild_Dungeon_Manager _c_manager, string _str)
 	{
-		string[] strs_monster = _str.Split('/');
-		
 		m_l_enemy = new List<Wild_Character>();
-		for(int i = 0; i < strs_monster.Length; i++)
+
+		if(!_str.Equals("NONE"))
 		{
-			Wild_Character enemy = new Wild_Character();
-			m_l_enemy.Add(enemy);
+			string[] strs_monster = _str.Split('/');
+			
+			for(int i = 0; i < strs_monster.Length; i++)
+			{
+				Wild_Character enemy = new Wild_Character();
+				enemy.Wild_InitAnother(_c_manager);
+				enemy.Wild_Init(m_basic, strs_monster[i], Wild_Object_TYPE.ENEMY );
+				m_l_enemy.Add(enemy);
+			}
 		}
 	}
 

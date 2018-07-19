@@ -1,0 +1,13 @@
+ObjectPath
+str,dex,int,vital,speed                         // basic status
+str,dex,int,vital,speed                         // up status
+loop!right0/right1...!left0/left1...            // Idle
+loop!right0/right1...!left0/left1...            // Move
+loop!right0/right1...!left0/left1...            // Sword Attack
+loop!right0/right1...!left0/left1...            // Defence
+loop!right0/right1...!left0/left1...            // skill0
+loop!right0/right1...!left0/left1...            // skill1
+loop!right0/right1...!left0/left1...            // skill2
+loop!right0/right1...!left0/left1...            // skill3
+
+loop!start,end/...!start,end/...

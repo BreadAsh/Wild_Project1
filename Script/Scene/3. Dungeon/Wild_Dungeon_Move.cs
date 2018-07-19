@@ -48,11 +48,33 @@ public class Wild_Dungeon_Move : Wild_UI_Manager
 	{
 		base.Wild_Init(_canvas);
 
+		Wild_Minimap_Init();
+
 		m_enum = (int)Wild_Dungeon_UI.Move;
 	}
+
+	#region mini map
+	GameObject[] m_minimap_a_tile;
+	/********** Getter & Setter	**********/
+
+	/********** Method	**********/
+
+	/********** Default Method	**********/
+	void Wild_Minimap_Init()
+	{
+		m_minimap_a_tile = new GameObject[25];
+		for(int i = m_minimap_a_tile.Length - 1; i >= 0; i--)
+		{
+			m_minimap_a_tile[i] = Object.Instantiate(Resources.Load<GameObject>("UI/3. Dungeon/MiniMap_Tile"));
+			m_minimap_a_tile[i].transform.parent = m_basic.transform;
+			m_minimap_a_tile[i].transform.localPosition = new Vector3(0.0f, 0.0f, 0.0f);
+			m_minimap_a_tile[i].transform.Rotate(-90.0f, 0.0f, 0.0f);
+		}
+	}
+	#endregion
 }
 
-#region btn
+#region btn class
 class Wild_Dungeon_Move_Btn_LeftMove : Wild_UI_Btn
 {
 	Wild_Dungeon_Manager m_c_manager;
@@ -84,7 +106,7 @@ class Wild_Dungeon_Move_Btn_TopMove : Wild_UI_Btn
 	/********** Method	**********/
 	public override void Wild_Click()
 	{
-		m_c_manager.Wild_Rooms_Move(m_c_manager.Wild_GetDungeonX());
+		m_c_manager.Wild_Rooms_Move(m_c_manager.Wild_Rooms_GetDungeonX());
 	}
 
 	/********** Default Method	**********/
@@ -126,7 +148,7 @@ class Wild_Dungeon_Move_Btn_BottomMove : Wild_UI_Btn
 	/********** Method	**********/
 	public override void Wild_Click()
 	{
-		m_c_manager.Wild_Rooms_Move(-m_c_manager.Wild_GetDungeonX());
+		m_c_manager.Wild_Rooms_Move(-m_c_manager.Wild_Rooms_GetDungeonX());
 	}
 
 	/********** Default Method	**********/

@@ -4,9 +4,9 @@ using UnityEngine;
 
 enum Wild_Tile_TYPE
 {
-	Wild_Tile_TYPE_NOT,
-	Wild_Tile_TYPE_DEFAULT,
-	Wild_Tile_TYPE_GRASS,
+	NOT,
+	DEFAULT,
+	GRASS,
 
 }
 
@@ -15,6 +15,7 @@ public class Wild_Tile
 	Wild_Object m_object;
 
 	//
+	GameObject m_model;
 	Transform m_texture;
 
 	int m_number;	// 타일의 번호
@@ -25,6 +26,8 @@ public class Wild_Tile
 	/********** Getter & Setter	**********/
 	public Wild_Object Wild_GetObject() { return m_object; }
 	public void Wild_SetObject(Wild_Object _object) { m_object = _object; }
+
+	public Vector3 Wild_GetPosition() { return m_model.transform.position; }
 
 	//
 	public int Wild_GetNumber() { return m_number; }
@@ -43,8 +46,8 @@ public class Wild_Tile
 		string path = "";
 		switch(m_type)
 		{
-			case (int)Wild_Tile_TYPE.Wild_Tile_TYPE_DEFAULT:	path = "Tile/hex_not_tex";		break;
-			case (int)Wild_Tile_TYPE.Wild_Tile_TYPE_GRASS:		path = "Tile/hex_grass_tex";	break;
+			case (int)Wild_Tile_TYPE.DEFAULT:	path = "Tile/hex_not_tex";		break;
+			case (int)Wild_Tile_TYPE.GRASS:		path = "Tile/hex_grass_tex";	break;
 		}
 		m_texture.GetComponent<Renderer>().material.mainTexture = Resources.Load<Texture>(path);
 	}
@@ -52,7 +55,7 @@ public class Wild_Tile
 	public bool Wild_IsMove()
 	{
 		bool res = true;
-		if(m_type == (int)Wild_Tile_TYPE.Wild_Tile_TYPE_NOT)
+		if(m_type == (int)Wild_Tile_TYPE.NOT)
 			res = false;
 
 		return res;
@@ -66,21 +69,21 @@ public class Wild_Tile
 		m_y = _y;
 
 		// 타일속성 셋팅
-		GameObject model = Object.Instantiate(Resources.Load<GameObject>("Tile/tile"));
-		model.name = "hex_" + _number;
-		model.transform.parent = _parent.transform;
-		model.transform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
-		model.transform.Rotate(0.0f, 0.0f, 0.0f);
-		m_texture = model.transform.Find("texture").transform;
+		m_model = Object.Instantiate(Resources.Load<GameObject>("Tile/tile"));
+		m_model.name = "hex_" + _number;
+		m_model.transform.parent = _parent.transform;
+		m_model.transform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
+		m_model.transform.Rotate(0.0f, 0.0f, 0.0f);
+		m_texture = m_model.transform.Find("texture").transform;
 		for(int i = 0; i < 3; i++)
 		{
-			Transform tempObj = model.transform.Find("" + i);
+			Transform tempObj = m_model.transform.Find("" + i);
 			tempObj.name = "" + _number;
 		}
 		// 위치
 		Vector3 pos = new Vector3(m_x * 7.0f, 0.0f, m_y * 6.1f);
         if(m_y % 2 == 1) { pos.x += 3.5f; }
-		model.transform.localPosition = pos;
+		m_model.transform.localPosition = pos;
 
 		Wild_ChangeType(_type);
 	}
