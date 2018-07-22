@@ -11,7 +11,9 @@ public enum Wild_Character_Active_TYPE
 {
     IDLE,
     MOVE,
-    ATTACK
+    ATTACK_PUNCH,
+    ATTACK_SWORD,
+	DAMAGE
 }
 
 public class Wild_Motion
@@ -77,18 +79,19 @@ public class Wild_Active
 	public virtual void Wild_ActiveFrameEnd() {}
 
 	/********** Default Method	**********/
-	public virtual void Wild_Init(string _str)
+	public virtual string[] Wild_Init(string _str)
 	{
+		string[] res = _str.Split('!');
 		//
 		m_l_motion_right = new List<Wild_Motion>();
 		m_l_motion_left = new List<Wild_Motion>();
 
-		string[] strs1 = _str.Split('!');
-
         m_isLoop = false;
-        if(strs1[0].Equals("1")) m_isLoop = true;
-		Wild_Init_SetFrameList(true, strs1[1]);
-		Wild_Init_SetFrameList(false, strs1[2]);
+        if(res[0].Equals("1")) m_isLoop = true;
+		Wild_Init_SetFrameList(true, res[1]);
+		Wild_Init_SetFrameList(false, res[2]);
+
+		return res;
 	}
 
 	void Wild_Init_SetFrameList(bool _isRight, string _strs1)
@@ -119,11 +122,13 @@ public class Wild_Active_Idle : Wild_Active
     }
 
 	/********** Default Method	**********/
-	public override void Wild_Init(string _str)
+	public override string[] Wild_Init(string _str)
     {
         base.Wild_Init(_str);
 
         m_type = Wild_Character_Active_TYPE.IDLE;
+
+		return null;
     }
 }
 
@@ -143,11 +148,10 @@ public class Wild_Active_Move : Wild_Active
 	// 업데이트가 끝날 때마다 이벤트가 발생
 	public override void Wild_ActiveAlways()
     {
-		m_transform.position = Vector3.Lerp(m_transform.position, m_destination.Wild_GetPosition(), Time.deltaTime);
+		m_transform.position = Vector3.Lerp(m_transform.position, m_destination.Wild_GetPosition(), Time.deltaTime * 2.0f);
 
 		if(Vector3.Distance(m_transform.position, m_destination.Wild_GetPosition()) < 0.1f)
 		{
-			Debug.Log("arrive");
 			m_transform.position = m_destination.Wild_GetPosition();
 			m_c_character.Wild_Active_SettingSelActive(Wild_Character_Active_TYPE.IDLE);
 		}
@@ -172,14 +176,69 @@ public class Wild_Active_Move : Wild_Active
 	}
 
 	/********** Default Method	**********/
-	public override void Wild_Init(string _str)
+	public override string[] Wild_Init(string _str)
     {
         base.Wild_Init(_str);
 
         m_type = Wild_Character_Active_TYPE.MOVE;
+
+		return null;
     }
 }
 
+public class Wild_Active_Attack : Wild_Active
+{
+	Wild_Object m_target;
+
+	/********** Method	**********/
+
+	// 업데이트가 끝날 때마다 이벤트가 발생
+	public override void Wild_ActiveFrameEnd()
+    {
+    }
+
+	//
+	public void Wild_ActiveSetting(Wild_Object _target)
+	{
+		m_target = _target;
+	}
+
+	/********** Default Method	**********/
+	public override string[] Wild_Init(string _str)
+    {
+        string[] strs = base.Wild_Init(_str);
+
+		switch(strs[3])
+		{
+		case "0":	m_type = Wild_Character_Active_TYPE.ATTACK_PUNCH;	break;
+		}
+
+		return null;
+    }
+}
+
+public class Wild_Active_Damage : Wild_Active
+{
+	Wild_Object m_target;
+
+	/********** Method	**********/
+
+	// 업데이트가 끝날 때마다 이벤트가 발생
+	public override void Wild_ActiveFrameEnd()
+    {
+
+    }
+
+	/********** Default Method	**********/
+	public override string[] Wild_Init(string _str)
+    {
+        base.Wild_Init(_str);
+
+        m_type = Wild_Character_Active_TYPE.DAMAGE;
+
+		return null;
+    }
+}
 #endregion
 
 //////////	//////////
@@ -199,6 +258,12 @@ public class Wild_Character : Wild_Object
 {
 	int m_level;
 	int m_exp;
+
+	Wild_Weapon m_rHand;
+	Wild_Equipment m_helm;
+	Wild_Equipment m_armor;
+	Wild_Equipment m_gloves;
+	Wild_Equipment m_boots;
 
     struct BA_Unit_Status
     {
@@ -272,6 +337,12 @@ public class Wild_Character : Wild_Object
 
 	bool Wild_Init_Character(StreamReader _reader, Wild_Object_TYPE _type)
 	{
+		m_rHand = null;
+		m_helm = null;
+		m_armor = null;
+		m_gloves = null;
+		m_boots = null;
+
 		bool res = false;
 
 		if(_reader != null)
@@ -318,6 +389,7 @@ public class Wild_Character : Wild_Object
     //////////  //////////
 	#region Active
 	Wild_Active_Move m_active_c_move;
+	Wild_Active_Attack m_active_c_attack_punch;
 
 	int m_active_defaultTileNumber;
 	int m_active_nowTileNumber;
@@ -335,6 +407,11 @@ public class Wild_Character : Wild_Object
     bool m_active_isRight;
 
 	/********** Getter & Setter	**********/
+
+	public override void Wild_Damage(int _damage)
+	{
+		Wild_Active_SettingSelActive(Wild_Character_Active_TYPE.DAMAGE);
+	}
 
 	public int Wild_Active_GetActivePoint() { return m_active_activePoint; }
 
@@ -422,8 +499,12 @@ public class Wild_Character : Wild_Object
 			}
 		}
 
+		// 사거리
+		int range = 1;
+		if(m_rHand != null) range = m_rHand.Wild_GetRange();
+
 		// 이동
-		if(dis > 1)
+		if(dis > range)
 		{
 			int dis2 = 9999;
 			int des2 = -1;
@@ -445,7 +526,18 @@ public class Wild_Character : Wild_Object
 		// 공격
 		else
 		{
-			m_c_manager.Wild_Tile_GetTile(des).Wild_GetObject();
+			if(m_rHand == null)
+			{
+				m_active_c_attack_punch.Wild_ActiveSetting( m_c_manager.Wild_Tile_GetTile(des).Wild_GetObject() );
+				Wild_Active_SettingSelActive(Wild_Character_Active_TYPE.ATTACK_PUNCH);
+			}
+			else
+			{
+				switch(m_rHand.Wild_GetType())
+				{
+					
+				}
+			}
 		}
 	}
 
@@ -502,6 +594,10 @@ public class Wild_Character : Wild_Object
 		m_active_c_move.Wild_Init(_reader.ReadLine());
 		m_active_c_move.Wild_InitAnother(this, m_c_manager, m_model.transform);
 		m_active_l_active.Add(m_active_c_move);
+
+		m_active_c_attack_punch = new Wild_Active_Attack();
+		m_active_c_attack_punch.Wild_Init(_reader.ReadLine());
+		m_active_l_active.Add(m_active_c_attack_punch);
 
 		Wild_Active_SettingSelActive(Wild_Character_Active_TYPE.IDLE);
 	}

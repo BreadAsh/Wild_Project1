@@ -206,6 +206,16 @@ public class Wild_Dungeon_Battle : Wild_UI_Manager
 		// 캐릭터의 행동이 끝났을 때
 		if(m_l_phase_character[0].Wild_Active_type().Equals(Wild_Character_Active_TYPE.IDLE))
 		{
+			// AStar 갱신
+			{
+				Wild_Update_SettingTempList();
+				for(int i = 0; i < m_l_tempList.Count; i++)
+				{
+					m_l_tempList[i].Wild_AStar_Setting();
+				}
+			}
+
+			// 행동이 끝난 캐릭터 제외
 			m_l_phase_character.RemoveAt(0);
 			
 			// 행동할 애들 없니?

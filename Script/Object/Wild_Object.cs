@@ -56,6 +56,18 @@ public class Wild_Object
 
 	}
 
+    //////////  //////////
+	#region Active
+
+	/********** Method	**********/
+	public virtual void Wild_Damage(int _damage)
+	{
+		m_hp -= _damage;
+	}
+
+	#endregion
+
+	//////////	//////////
 	#region AStar
     public enum Wild_AStar_CONDITION
     {
