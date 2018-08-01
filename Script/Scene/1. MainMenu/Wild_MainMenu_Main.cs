@@ -17,6 +17,7 @@ public class Wild_MainMenu_Main : Wild_UI_Manager
 		Wild_MainMenu_Main_Btn_Battle battle_btn = new Wild_MainMenu_Main_Btn_Battle();
 		battle_btn.Wild_Init(btn_num, "1. MainMenu/Battle_Idle_Tex", "1. MainMenu/Battle_Press_Tex", m_basic.transform);
 		m_l_btn.Add(battle_btn);
+		m_l_touchArea.Add(battle_btn);
 	}
 }
 

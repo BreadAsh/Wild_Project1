@@ -36,6 +36,10 @@ public class Wild_Dungeon_Battle : Wild_UI_Manager
 	public void Wild_InitSetting( Wild_Dungeon_Manager _c_manager )
 	{
 		m_c_manager = _c_manager;
+		for(int i = 0; i < m_c_manager.Wild_Tile_GetTileCount(); i++)
+		{
+			m_l_touchArea.Add(m_c_manager.Wild_Tile_GetTile(i));
+		}
 	}
 
 	/********** Default Method	**********/

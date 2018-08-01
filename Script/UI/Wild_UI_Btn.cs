@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 // TODO: 버튼이 상속받는 클래스. 추가로 정의되어야하는 변수는 해당 클래스에서 정의하세요
-public class Wild_UI_Btn
+public class Wild_UI_Btn : Wild_Touch_Area
 {
-	int m_number;
-
 	// 그래픽
 	GameObject m_model;
 	Renderer m_renderer;
@@ -15,7 +13,6 @@ public class Wild_UI_Btn
     Texture m_imgOnTouch;
 
 	/********** Getter & Setter	**********/
-	public int Wild_GetNumber() { return m_number; }
 	
 	/********** Method	**********/
 	public virtual void Wild_Click() { }
@@ -42,10 +39,17 @@ public class Wild_UI_Btn
 	/********** Default Method	**********/
 	public virtual void Wild_Init(int _number, string _idle, string _onTouch, Transform _parent)
 	{
+		m_type = Touch_TYPE.BUTTON;
 		m_number = _number;
 
 		// obj
-		m_model = Object.Instantiate(Resources.Load<GameObject>("UI/Button"));
+		//m_model = Object.Instantiate(Resources.Load<GameObject>("UI/Button"));
+		m_model = Object.Instantiate(Resources.Load<GameObject>("UI/Button2"));
+		m_a_vertex = new Transform[4];
+		m_a_vertex[0] = m_model.transform.Find("0");
+		m_a_vertex[1] = m_model.transform.Find("1");
+		m_a_vertex[2] = m_model.transform.Find("2");
+		m_a_vertex[3] = m_model.transform.Find("3");
 		m_model.name = "" + _number;
 		m_model.transform.parent = _parent;
 		m_model.transform.localPosition = new Vector3(0.0f, 0.0f, 0.0f);
@@ -64,9 +68,19 @@ public class Wild_UI_Btn
 	public void Wild_Release()
 	{
 		// 그래픽
-		if(m_model != null)	MonoBehaviour.Destroy(m_model);
+		if(m_model != null)
+		{
+			m_model.SetActive(false);
+			m_model = null;
+		}
 
-		if(m_imgIdle != null)	 MonoBehaviour.Destroy(m_imgIdle);
-		if(m_imgOnTouch != null) MonoBehaviour.Destroy(m_imgOnTouch);
+		if(m_imgIdle != null)
+		{
+			m_imgIdle = null;
+		}
+		if(m_imgOnTouch != null)
+		{
+			m_imgOnTouch = null;
+		}
 	}
 }

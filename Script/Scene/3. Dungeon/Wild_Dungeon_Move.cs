@@ -12,24 +12,28 @@ public class Wild_Dungeon_Move : Wild_UI_Manager
 		leftMove_btn.Wild_Init(btn_num, "2. WorldMap/Dungeon_Idle_Tex", "1. MainMenu/Battle_Press_Tex", m_basic.transform);
 		leftMove_btn.Wild_SetClassManager(_c_manager);
 		m_l_btn.Add(leftMove_btn);
+		m_l_touchArea.Add(leftMove_btn);
 
 		btn_num++;
 		Wild_Dungeon_Move_Btn_TopMove topMove_btn = new Wild_Dungeon_Move_Btn_TopMove();
 		topMove_btn.Wild_Init(btn_num, "2. WorldMap/Dungeon_Idle_Tex", "1. MainMenu/Battle_Press_Tex", m_basic.transform);
 		topMove_btn.Wild_SetClassManager(_c_manager);
 		m_l_btn.Add(topMove_btn);
+		m_l_touchArea.Add(topMove_btn);
 
 		btn_num++;
 		Wild_Dungeon_Move_Btn_RightMove rightMove_btn = new Wild_Dungeon_Move_Btn_RightMove();
 		rightMove_btn.Wild_Init(btn_num, "2. WorldMap/Dungeon_Idle_Tex", "1. MainMenu/Battle_Press_Tex", m_basic.transform);
 		rightMove_btn.Wild_SetClassManager(_c_manager);
 		m_l_btn.Add(rightMove_btn);
+		m_l_touchArea.Add(rightMove_btn);
 
 		btn_num++;
 		Wild_Dungeon_Move_Btn_BottomMove bottomMove_btn = new Wild_Dungeon_Move_Btn_BottomMove();
 		bottomMove_btn.Wild_Init(btn_num, "2. WorldMap/Dungeon_Idle_Tex", "1. MainMenu/Battle_Press_Tex", m_basic.transform);
 		bottomMove_btn.Wild_SetClassManager(_c_manager);
 		m_l_btn.Add(bottomMove_btn);
+		m_l_touchArea.Add(bottomMove_btn);
 	}
 
 	public void Wild_SettingBtnActive(bool[] _a_isMove)

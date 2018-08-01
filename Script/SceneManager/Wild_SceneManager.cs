@@ -2,17 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum Touch_TYPE
-{
-	NOT,
-
-	// UI
-	BUTTON,
-
-	// Object
-	TILE,
-}
-
 // TODO: 씬매니저들이 공동으로 상속받는 클래스. 상속받은 클래스는 카메라에 넣어서 쓰세요~
 public class Wild_SceneManager : MonoBehaviour
 {
@@ -114,7 +103,7 @@ public class Wild_SceneManager : MonoBehaviour
 	{
 		if(Wild_ScreenInput(TouchPhase.Began))
 		{
-			GameObject obj = Wild_Update_Raycast();
+			Wild_Touch_Area obj = Wild_Update_Raycast();
 			if(obj != null)
 			{
 				Wild_Update_Began(obj);
@@ -124,7 +113,7 @@ public class Wild_SceneManager : MonoBehaviour
 		{
 			g_isInputOn = false;
 			
-			GameObject obj = Wild_Update_Raycast();
+			Wild_Touch_Area obj = Wild_Update_Raycast();
 			if(obj != null)
 			{
 				Wild_Update_Moved(obj);
@@ -154,42 +143,31 @@ public class Wild_SceneManager : MonoBehaviour
 	}
 
 	//
-	protected virtual void Wild_Update_Began(GameObject _obj)
+	protected virtual void Wild_Update_Began(Wild_Touch_Area _obj)
 	{
-		switch(_obj.tag)
+		g_inputType = _obj.Wild_GetType();
+		g_inputCount = _obj.Wild_GetNumber();
+		if(g_inputType == Touch_TYPE.TILE)
 		{
-			case "UIButton":
-				{
-					g_inputType = Touch_TYPE.BUTTON;
-
-					g_inputCount = int.Parse(_obj.name);
-				}
-				break;
-			case "Map":
-				{
-					g_inputType = Touch_TYPE.TILE;
-
-					g_inputCount = int.Parse(_obj.transform.name);
-				}
-				break;
+			Debug.Log("aa " + g_inputCount);
 		}
 
 		g_beganPosition = Wild_TouchPosition();
 	}
 
 	//
-	protected virtual void Wild_Update_Moved(GameObject _obj)
+	protected virtual void Wild_Update_Moved(Wild_Touch_Area _obj)
 	{
-		switch(_obj.tag)
+		switch(_obj.Wild_GetType())
 		{
-			case "UIButton":
-				if((g_inputType == Touch_TYPE.BUTTON) && (g_inputCount == int.Parse(_obj.name)))
+			case Touch_TYPE.BUTTON:
+				if((g_inputType == Touch_TYPE.BUTTON) && (g_inputCount == _obj.Wild_GetNumber()))
 				{
 					g_isInputOn = true;
 					m_l_UIManager[m_selUICount].Wild_FindBtn(g_inputCount).Wild_Tex_OnTouch();
 				}
 				break;
-			case "Map":
+			case Touch_TYPE.TILE:
 				{
 					if((g_inputType == Touch_TYPE.TILE))
 					{
@@ -219,18 +197,14 @@ public class Wild_SceneManager : MonoBehaviour
 				break;
 		}
 	}
-
-	GameObject Wild_Update_Raycast()
+	
+	Wild_Touch_Area Wild_Update_Raycast()
 	{
-		GameObject res = null;
+		Wild_Touch_Area res = null;
 
 		Ray ray;
-		RaycastHit hitInfo;
 		ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-		if (Physics.Raycast(ray, out hitInfo))
-		{
-			res = hitInfo.transform.gameObject;
-		}
+		res = m_l_UIManager[m_selUICount].Wild_CheckTouch(ray.origin, ray.direction);
 
 		return res;
 	}

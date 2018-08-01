@@ -11,6 +11,8 @@ public class Wild_UI_Manager
 
 	protected List<Wild_UI_Btn> m_l_btn;
 
+	protected List<Wild_Touch_Area> m_l_touchArea;
+
 	/********** Getter & Setter	**********/
 	public int Wild_GetEnum() { return m_enum; }
 	
@@ -43,6 +45,21 @@ public class Wild_UI_Manager
 		return res;
 	}
 
+	public Wild_Touch_Area Wild_CheckTouch(Vector3 rayOrigin, Vector3 rayDir)
+	{
+		Wild_Touch_Area res = null;
+		for(int i = 0; i < m_l_touchArea.Count; i++)
+		{
+			if(m_l_touchArea[i].Wild_CheckTouch(rayOrigin, rayDir))
+			{
+				res = m_l_touchArea[i];
+				break;
+			}
+		}
+
+		return res;
+	}
+
 	/********** Default Method	**********/
 	public virtual void Wild_Init(GameObject _canvas)
 	{
@@ -53,6 +70,7 @@ public class Wild_UI_Manager
 		m_basic.SetActive(false);
 
 		m_l_btn = new List<Wild_UI_Btn>();
+		m_l_touchArea = new List<Wild_Touch_Area>();
 	}
 
 	public virtual void Wild_Release()

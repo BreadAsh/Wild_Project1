@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 //
 using System.IO;
+using LitJson;
 
 public enum Wild_Dungeon_UI
 {
@@ -189,7 +190,7 @@ public class Wild_Dungeon_Manager : Wild_SceneManager
 				m_rooms_dungeonX = int.Parse(dungeonSize[0]);
 				m_rooms_dungeonY = int.Parse(dungeonSize[1]);
 				m_rooms_roomCount = int.Parse(strs1[1]);
-				Debug.Log("Wild_Init_Dungeon " + m_rooms_dungeonX + " " + m_rooms_dungeonY);
+				//Debug.Log("Wild_Init_Dungeon " + m_rooms_dungeonX + " " + m_rooms_dungeonY);
 			}
 
 			//
@@ -284,7 +285,7 @@ public class Wild_Dungeon_Manager : Wild_SceneManager
 				int tempNum = x + (y * (int)Wild_Map_SIZE.X);
 				// 헥스의 속성을 셋팅
 				m_tile_a_tile[tempNum] = new Wild_Tile();
-                m_tile_a_tile[tempNum].Wild_Init(x + (y * (int)Wild_Map_SIZE.Y), x, y, (int)Wild_Tile_TYPE.GRASS, m_tile_basic);
+                m_tile_a_tile[tempNum].Wild_Init(tempNum, x, y, Wild_Tile_ATTRIBUTE.GRASS, m_tile_basic);
 
 				// 맵이동 범위 지정
 				//if(m_right < obj.transform.localPosition.x) m_right = hexPos.x;
