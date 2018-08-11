@@ -362,7 +362,8 @@ public class Wild_Character : Wild_Object
 	/********** Default Method	**********/
 	public override void Wild_Init(GameObject _parent, string _str, Wild_Object_TYPE _type)
 	{
-		string[] strs = _str.Split(',');
+		Debug.Log(_str);
+		string[] strs = _str.Split('/');
 
 		string path = "";
 		switch(_type)
@@ -375,7 +376,7 @@ public class Wild_Character : Wild_Object
 				path = "Assets/Wild_Project1/Data/Enemy/";	break;
 		}
 
-		StreamReader reader = Wild_Static_File.Wild_FileReader(path + strs[2]);
+		StreamReader reader = Wild_Static_File.Wild_FileReader(path + strs[1]);
 		if(reader != null)
 		{
 			//
@@ -384,10 +385,11 @@ public class Wild_Character : Wild_Object
 				//
 				m_number = int.Parse(strs[0]);
 				//
-				m_active_defaultTileNumber = m_active_nowTileNumber = int.Parse(strs[1]);
+				m_active_defaultTileNumber = m_active_nowTileNumber = int.Parse(strs[10]);
 				m_c_manager.Wild_Tile_GetTile(m_active_defaultTileNumber).Wild_SetObject(this);
 				//
-				m_level = int.Parse(strs[3]);
+				m_level = int.Parse(strs[2]);
+				m_exp = int.Parse(strs[3]);
 
 				reader.Close();
 			}

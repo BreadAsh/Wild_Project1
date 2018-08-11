@@ -50,18 +50,22 @@ public class Wild_Static_File
 		saveJson = null;
 	}
 
-	public static void Wild_JsonLoad(string _path)
+	public static JsonData Wild_JsonLoad(string _path)
 	{
-		string path = Application.dataPath + _path + ".json";
+		JsonData res = null;
+
+		string path = Application.dataPath + "/Wild_Project1/" + _path + ".json";
 		if(File.Exists(path))
 		{
 			string str = File.ReadAllText(path);
 
-			JsonData data = JsonMapper.ToObject(str);
+			res = JsonMapper.ToObject(str);
 		}
 		else
 		{
 			Debug.Log("open fail!");
 		}
+
+		return res;
 	}
 }

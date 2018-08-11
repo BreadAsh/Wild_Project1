@@ -1,2 +1,61 @@
-[   {"m_rooms_dungeonX":5,"m_rooms_dungeonY":4, "m_rooms_roomCount":0},
-    {}]
+[   {"dungeonX":5,"dungeonY":4, "startRoomNumber":0},
+
+    {"roomNumber":0,
+    "roomType":"MOVE",
+    "move0":0, "move1":0, "move2":1, "move3":0,
+    "monsterList":[],
+    "itemList":[],
+    "tileSet":[
+        {"property":1},{"property":1},{"property":1},{"property":1},{"property":1},{"property":1},{"property":1},{"property":1},{"property":1},{"property":1},
+        {"property":0},{"property":0},{"property":0},{"property":0},{"property":0},{"property":0},{"property":0},{"property":0},{"property":0},{"property":0},
+        {"property":1},{"property":1},{"property":1},{"property":1},{"property":1},{"property":1},{"property":1},{"property":1},{"property":1},{"property":1},
+        {"property":0},{"property":0},{"property":0},{"property":0},{"property":0},{"property":0},{"property":0},{"property":0},{"property":0},{"property":0},
+        {"property":1},{"property":1},{"property":1},{"property":1},{"property":1},{"property":1},{"property":1},{"property":1},{"property":1},{"property":1}]},
+
+    {"roomNumber":1,
+    "roomType":"ITEM",
+    "move0":1, "move1":0, "move2":1, "move3":0,
+    "monsterList":[],
+    "itemList":[
+        {"itemName":"0", "percentage":100},
+        {"itemName":"1", "percentage":100},
+        {"itemName":"2", "percentage":100}],
+    "tileSet":[
+        {"property":0},{"property":0},{"property":0},{"property":0},{"property":0},{"property":0},{"property":0},{"property":0},{"property":0},{"property":0},
+        {"property":1},{"property":1},{"property":1},{"property":1},{"property":1},{"property":1},{"property":1},{"property":1},{"property":1},{"property":1},
+        {"property":0},{"property":0},{"property":0},{"property":0},{"property":0},{"property":0},{"property":0},{"property":0},{"property":0},{"property":0},
+        {"property":1},{"property":1},{"property":1},{"property":1},{"property":1},{"property":1},{"property":1},{"property":1},{"property":1},{"property":1},
+        {"property":1},{"property":1},{"property":1},{"property":1},{"property":1},{"property":1},{"property":1},{"property":1},{"property":1},{"property":1}]},
+
+    {"roomNumber":2,
+    "roomType":"BATTLE",
+    "move0":1, "move1":0, "move2":1, "move3":0,
+    "monsterList":[
+        {"Name":"0", "Model":"temp","Level":1, "Exp":0, "RightHand":-1, "LeftHand":-1, "Head":-1, "Armor":-1, "Gloves":-1, "Boots":-1, "Position":9},
+        {"Name":"1", "Model":"temp","Level":1, "Exp":0, "RightHand":-1, "LeftHand":-1, "Head":-1, "Armor":-1, "Gloves":-1, "Boots":-1, "Position":19}],
+    "itemList":[
+        {"itemName":"0", "percentage":100},
+        {"itemName":"1", "percentage":100},
+        {"itemName":"2", "percentage":100}],
+    "tileSet":[
+        {"property":1},{"property":1},{"property":1},{"property":1},{"property":1},{"property":1},{"property":1},{"property":1},{"property":1},{"property":1},
+        {"property":0},{"property":0},{"property":0},{"property":0},{"property":0},{"property":0},{"property":0},{"property":0},{"property":0},{"property":0},
+        {"property":1},{"property":1},{"property":1},{"property":1},{"property":1},{"property":1},{"property":1},{"property":1},{"property":1},{"property":1},
+        {"property":0},{"property":0},{"property":0},{"property":0},{"property":0},{"property":0},{"property":0},{"property":0},{"property":0},{"property":0},
+        {"property":1},{"property":1},{"property":1},{"property":1},{"property":1},{"property":1},{"property":1},{"property":1},{"property":1},{"property":1}]},
+
+    {"roomNumber":3,
+    "roomType":"CLEAR",
+    "move0":0, "move1":0, "move2":0, "move3":0,
+    "monsterList":[],
+    "itemList":[
+        {"itemName":"0", "percentage":100},
+        {"itemName":"1", "percentage":100},
+        {"itemName":"2", "percentage":100}],
+    "tileSet":[
+        {"property":0},{"property":0},{"property":0},{"property":0},{"property":0},{"property":0},{"property":0},{"property":0},{"property":0},{"property":0},
+        {"property":1},{"property":1},{"property":1},{"property":1},{"property":1},{"property":1},{"property":1},{"property":1},{"property":1},{"property":1},
+        {"property":0},{"property":0},{"property":0},{"property":0},{"property":0},{"property":0},{"property":0},{"property":0},{"property":0},{"property":0},
+        {"property":1},{"property":1},{"property":1},{"property":1},{"property":1},{"property":1},{"property":1},{"property":1},{"property":1},{"property":1},
+        {"property":1},{"property":1},{"property":1},{"property":1},{"property":1},{"property":1},{"property":1},{"property":1},{"property":1},{"property":1}]}
+]

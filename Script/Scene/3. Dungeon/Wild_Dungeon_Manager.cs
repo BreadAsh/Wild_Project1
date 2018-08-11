@@ -194,55 +194,23 @@ public class Wild_Dungeon_Manager : Wild_SceneManager
 	{
 		m_rooms_l_room = new List<Wild_Dungeon_Room>();
 
-		StreamReader reader = Wild_Static_File.Wild_FileReader("Assets/Wild_Project1/Data/Dungeon/" + "0" + ".txt");
-		if(reader != null)
+		JsonData dungeonData = Wild_Static_File.Wild_JsonLoad("Data/Dungeon/0");
+		if(dungeonData != null)
 		{
-			//
+			// 던전의 크기 및 시작점 초기화
 			{
-				string temp = reader.ReadLine();
-				string[] strs1 = temp.Split('!');
-				string[] dungeonSize = strs1[0].Split(',');
-
-				m_rooms_dungeonX = int.Parse(dungeonSize[0]);
-				m_rooms_dungeonY = int.Parse(dungeonSize[1]);
-				m_rooms_roomCount = int.Parse(strs1[1]);
-				//Debug.Log("Wild_Init_Dungeon " + m_rooms_dungeonX + " " + m_rooms_dungeonY);
+				m_rooms_dungeonX = int.Parse(dungeonData[0]["dungeonX"].ToString());
+				m_rooms_dungeonY = int.Parse(dungeonData[0]["dungeonY"].ToString());
+				m_rooms_roomCount = int.Parse(dungeonData[0]["startRoomNumber"].ToString());
 			}
 
-			//
+			// 룸 데이터 초기화
+			for(int i = 1; i < dungeonData.Count; i++)
 			{
-				string temp = "";
-				int i = 0;
-
-				while(true)
-				{
-					temp = reader.ReadLine();
-
-					if(temp.Equals("next"))
-					{
-						continue;
-					}
-					else if(temp.Equals("NONE"))
-					{
-						i++;
-						continue;
-					}
-					else if(temp.Equals("end"))
-					{
-						break;
-					}
-					
-					//Debug.Log("Wild_Init_Dungeon " + i);
-					Wild_Dungeon_Room room = new Wild_Dungeon_Room();
-					room.Wild_Init(this, m_rooms_dungeonX, i, temp);
-					m_rooms_l_room.Add(room);
-					
-					// 셋팅
-					i++;
-				}
+				Wild_Dungeon_Room room = new Wild_Dungeon_Room();
+				room.Wild_Init(this, m_rooms_dungeonX, dungeonData[i]);
+				m_rooms_l_room.Add(room);
 			}
-			
-			reader.Close();
 		}
 	}
 	#endregion
@@ -328,26 +296,28 @@ public class Wild_Dungeon_Manager : Wild_SceneManager
 	void Wild_Player_Init()
 	{
 		m_player_l_characters = new List<Wild_Character>();
-		StreamReader reader = Wild_Static_File.Wild_FileReader("Assets/Wild_Project1/SaveData/Character/List");
-        if(reader != null)
+		JsonData squardData = Wild_Static_File.Wild_JsonLoad("SaveData/squard");
+		if(squardData != null)
 		{
-			string str = reader.ReadLine();
-			
-			while(!str.Equals("END"))
+			for(int i = 0; i < squardData.Count; i++)
 			{
-				if(!str.Split(',')[1].Equals("-1"))
-				{
-					Wild_Character character = new Wild_Character();
-					character.Wild_InitAnother(this);
-					character.Wild_Init(m_tile_basic, str, Wild_Object_TYPE.CHARACTER);
-					m_player_l_characters.Add(character);
-				}
-
-				//
-				str = reader.ReadLine();
+				string str
+					= squardData[i]["Name"].ToString()
+					+ "/" + squardData[i]["Model"].ToString()
+					+ "/" + squardData[i]["Level"].ToString()
+					+ "/" + squardData[i]["Exp"].ToString()
+					+ "/" + squardData[i]["RightHand"].ToString()
+					+ "/" + squardData[i]["LeftHand"].ToString()
+					+ "/" + squardData[i]["Head"].ToString()
+					+ "/" + squardData[i]["Armor"].ToString()
+					+ "/" + squardData[i]["Gloves"].ToString()
+					+ "/" + squardData[i]["Boots"].ToString()
+					+ "/" + squardData[i]["Position"].ToString();
+				Wild_Character character = new Wild_Character();
+				character.Wild_InitAnother(this);
+				character.Wild_Init(m_tile_basic, str, Wild_Object_TYPE.CHARACTER);
+				m_player_l_characters.Add(character);
 			}
-
-			reader.Close();
 		}
 	}
 
@@ -358,9 +328,12 @@ public class Wild_Dungeon_Manager : Wild_SceneManager
 			m_player_l_characters[i].Wild_Update();
 		}
 
-		for(int i = 0; i < m_rooms_l_room[m_rooms_roomCount].Wild_GetEnemyCount(); i++)
+		if(m_rooms_l_room[m_rooms_roomCount].Wild_OnEnemyList())
 		{
-			m_rooms_l_room[m_rooms_roomCount].Wild_GetEnemy(i).Wild_Update();
+			for(int i = 0; i < m_rooms_l_room[m_rooms_roomCount].Wild_GetEnemyCount(); i++)
+			{
+				m_rooms_l_room[m_rooms_roomCount].Wild_GetEnemy(i).Wild_Update();
+			}
 		}
 	}
 	#endregion
