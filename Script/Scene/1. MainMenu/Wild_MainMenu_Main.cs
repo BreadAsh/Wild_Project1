@@ -7,17 +7,16 @@ using UnityEngine.SceneManagement;
 public class Wild_MainMenu_Main : Wild_UI_Manager
 {
 	/********** Default Method	**********/
-	public override void Wild_Init(GameObject _canvas)
+	public override void Wild_Init(Camera _camera, GameObject _canvas)
 	{
-		base.Wild_Init(_canvas);
+		base.Wild_Init(_camera, _canvas);
 
 		m_enum = (int)Wild_MainMenu_UI.Wild_MainMenu_UI_Main;
 
 		int btn_num = 0;
 		Wild_MainMenu_Main_Btn_Battle battle_btn = new Wild_MainMenu_Main_Btn_Battle();
 		battle_btn.Wild_Init(btn_num, "1. MainMenu/Battle_Idle_Tex", "1. MainMenu/Battle_Press_Tex", m_basic.transform);
-		m_l_btn.Add(battle_btn);
-		m_l_touchArea.Add(battle_btn);
+		Wild_Button_Add(battle_btn);
 	}
 }
 

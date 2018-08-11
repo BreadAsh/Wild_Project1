@@ -44,6 +44,11 @@ public class Wild_Dungeon_Room
 	public void Wild_On() { m_basic.SetActive(true); }
 	public void Wild_Off() { m_basic.SetActive(false); }
 
+	public void Wild_EnemyRemoveAt(int _num)
+	{
+		m_l_enemy.RemoveAt(_num);
+	}
+
 	/********** Default Method	**********/
 	// Wild_Init
 	public void Wild_Init(Wild_Dungeon_Manager _c_manager, int _dugeonX, int _number, string _str)

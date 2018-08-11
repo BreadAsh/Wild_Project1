@@ -65,7 +65,6 @@ public class Wild_Tile : Wild_Touch_Area
 		m_number = _number;
 		m_x = _x;
 		m_y = _y;
-		Debug.Log("_number " + _number);
 
 		// 타일속성 셋팅
 		m_model = Object.Instantiate(Resources.Load<GameObject>("Tile/tile2"));

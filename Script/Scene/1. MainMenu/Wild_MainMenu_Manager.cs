@@ -15,7 +15,7 @@ public class Wild_MainMenu_Manager : Wild_SceneManager
 		base.Wild_Init();
 
 		Wild_MainMenu_Main c_main = new Wild_MainMenu_Main();
-		c_main.Wild_Init(m_canvas);
+		c_main.Wild_Init(m_UI_camera, m_UICanvas);
 		m_l_UIManager.Add(c_main);
 
 		Wild_SetActive((int)Wild_MainMenu_UI.Wild_MainMenu_UI_Main);

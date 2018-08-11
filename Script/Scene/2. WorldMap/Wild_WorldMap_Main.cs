@@ -7,14 +7,14 @@ using UnityEngine.SceneManagement;
 public class Wild_WorldMap_Main : Wild_UI_Manager
 {
 	/********** Default Method	**********/
-	public override void Wild_Init(GameObject _canvas)
+	public override void Wild_Init(Camera _camera, GameObject _canvas)
 	{
-		base.Wild_Init(_canvas);
+		base.Wild_Init(_camera, _canvas);
 
 		m_enum = (int)Wild_WorldMap_UI.Wild_WorldMap_UI_Main;
 
 
-		GameObject m_background = Object.Instantiate(Resources.Load<GameObject>("UI/2. WorldMap/Background"));
+		GameObject m_background = Object.Instantiate(Resources.Load<GameObject>("UI/Background"));
 		m_background.transform.parent = _canvas.transform;
 		m_background.transform.localPosition = new Vector3(0.0f, 0.0f, 1.0f);
 		m_background.transform.Rotate(90.0f, 180.0f, 0.0f);
@@ -28,7 +28,7 @@ public class Wild_WorldMap_Main : Wild_UI_Manager
 		int btn_num = 0;
 		Wild_WorldMap_Btn_Battle dungeon_btn = new Wild_WorldMap_Btn_Battle();
 		dungeon_btn.Wild_Init(btn_num, "2. WorldMap/Dungeon_Idle_Tex", "1. MainMenu/Battle_Press_Tex", m_basic.transform);
-		m_l_btn.Add(dungeon_btn);
+		Wild_Button_Add(dungeon_btn);
 	}
 }
 

@@ -43,9 +43,9 @@ public class Wild_Dungeon_Battle : Wild_UI_Manager
 	}
 
 	/********** Default Method	**********/
-	public override void Wild_Init(GameObject _canvas)
+	public override void Wild_Init(Camera _camera, GameObject _canvas)
 	{
-		base.Wild_Init(_canvas);
+		base.Wild_Init(_camera, _canvas);
 
 		m_enum = (int)Wild_Dungeon_UI.Battle;
 
@@ -235,6 +235,39 @@ public class Wild_Dungeon_Battle : Wild_UI_Manager
 			// 다음.
 			else
 			{
+				// 현재 캐릭터가 사망했는가?
+				if(!m_l_phase_character[0].Wild_GetModel().activeSelf)
+				{
+					switch(m_l_phase_character[0].Wild_GetType())
+					{
+						case Wild_Object_TYPE.CHARACTER:
+							{
+								for(int i = 0; i < m_c_manager.Wild_Player_GetCharacterListCount(); i++)
+								{
+									if(m_c_manager.Wild_Player_GetCharacter(i).Wild_GetNumber().Equals(m_l_phase_character[0].Wild_GetNumber()))
+									{
+										m_c_manager.Wild_Player_GetCharacter(i).Wild_Release();
+										m_c_manager.Wild_Player_CharacterRemoveAt(i);
+										break;
+									}
+								}
+							}
+							break;
+						case Wild_Object_TYPE.ENEMY:
+							{
+								for(int i = 0; i < m_room.Wild_GetEnemyCount(); i++)
+								{
+									if(m_room.Wild_GetEnemy(i).Wild_GetNumber().Equals(m_l_phase_character[0].Wild_GetNumber()))
+									{
+										m_room.Wild_GetEnemy(i).Wild_Release();
+										m_room.Wild_EnemyRemoveAt(i);
+										break;
+									}
+								}
+							}
+							break;
+					}
+				}
 				m_l_phase_character[0].Wild_Active_PhaseSetting();
 			}
 		}

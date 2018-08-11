@@ -5,7 +5,8 @@ using UnityEngine;
 // TODO: 씬매니저들이 공동으로 상속받는 클래스. 상속받은 클래스는 카메라에 넣어서 쓰세요~
 public class Wild_SceneManager : MonoBehaviour
 {
-	public GameObject m_canvas;
+	public Camera m_UI_camera;
+	public GameObject m_UICanvas;
 	protected List<Wild_UI_Manager> m_l_UIManager;
 	protected int m_selUICount;
 
@@ -125,7 +126,7 @@ public class Wild_SceneManager : MonoBehaviour
 				switch(g_inputType)
 				{
 					case Touch_TYPE.BUTTON:
-						m_l_UIManager[m_selUICount].Wild_FindBtn(g_inputCount).Wild_Tex_Idle();
+						m_l_UIManager[m_selUICount].Wild_Button_Find(g_inputCount).Wild_Tex_Idle();
 						break;
 				}
 			}
@@ -164,7 +165,7 @@ public class Wild_SceneManager : MonoBehaviour
 				if((g_inputType == Touch_TYPE.BUTTON) && (g_inputCount == _obj.Wild_GetNumber()))
 				{
 					g_isInputOn = true;
-					m_l_UIManager[m_selUICount].Wild_FindBtn(g_inputCount).Wild_Tex_OnTouch();
+					m_l_UIManager[m_selUICount].Wild_Button_Find(g_inputCount).Wild_Tex_OnTouch();
 				}
 				break;
 			case Touch_TYPE.TILE:
@@ -192,8 +193,8 @@ public class Wild_SceneManager : MonoBehaviour
 		switch(g_inputType)
 		{
 			case Touch_TYPE.BUTTON:
-				m_l_UIManager[m_selUICount].Wild_FindBtn(g_inputCount).Wild_Tex_Idle();
-				m_l_UIManager[m_selUICount].Wild_FindBtn(g_inputCount).Wild_Click();
+				m_l_UIManager[m_selUICount].Wild_Button_Find(g_inputCount).Wild_Tex_Idle();
+				m_l_UIManager[m_selUICount].Wild_Button_Find(g_inputCount).Wild_Click();
 				break;
 		}
 	}
@@ -201,11 +202,12 @@ public class Wild_SceneManager : MonoBehaviour
 	Wild_Touch_Area Wild_Update_Raycast()
 	{
 		Wild_Touch_Area res = null;
-
+/*
 		Ray ray;
 		ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 		res = m_l_UIManager[m_selUICount].Wild_CheckTouch(ray.origin, ray.direction);
-
+*/
+		res = m_l_UIManager[m_selUICount].Wild_CheckTouch();
 		return res;
 	}
 

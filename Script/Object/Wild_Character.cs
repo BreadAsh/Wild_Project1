@@ -11,9 +11,10 @@ public enum Wild_Character_Active_TYPE
 {
     IDLE,
     MOVE,
+	DAMAGE,
+	DEATH,
     ATTACK_PUNCH,
     ATTACK_SWORD,
-	DAMAGE
 }
 
 public class Wild_Motion
@@ -78,6 +79,9 @@ public class Wild_Active
 	// 모션이 끝날 때마다 이벤트가 발생
 	public virtual void Wild_ActiveFrameEnd() {}
 
+	// 행동이 종료할 때 발생
+	public virtual void Wild_ActiveEnd() {}
+
 	/********** Default Method	**********/
 	public virtual string[] Wild_Init(string _str)
 	{
@@ -114,12 +118,6 @@ public class Wild_Active
 public class Wild_Active_Idle : Wild_Active
 {
 	/********** Method	**********/
-
-	// 업데이트가 끝날 때마다 이벤트가 발생
-	public override void Wild_ActiveAlways()
-    {
-
-    }
 
 	/********** Default Method	**********/
 	public override string[] Wild_Init(string _str)
@@ -186,8 +184,78 @@ public class Wild_Active_Move : Wild_Active
     }
 }
 
+public class Wild_Active_Damage : Wild_Active
+{
+	Wild_Character m_c_character;
+	/********** Method	**********/
+
+	// 행동이 종료할 때 발생
+	public override void Wild_ActiveEnd()
+	{
+		Debug.Log("damage");
+		if(m_c_character.Wild_GetHp() <= 0)
+		{
+			m_c_character.Wild_Active_SettingSelActive(Wild_Character_Active_TYPE.DEATH);
+		}
+		else
+		{
+			m_c_character.Wild_Active_SettingSelActive(Wild_Character_Active_TYPE.IDLE);
+		}
+	}
+
+	//
+	public void Wild_InitAnother(Wild_Character _c_character)
+	{
+		m_c_character = _c_character;
+	}
+
+	/********** Default Method	**********/
+	public override string[] Wild_Init(string _str)
+    {
+        base.Wild_Init(_str);
+
+        m_type = Wild_Character_Active_TYPE.DAMAGE;
+
+		return null;
+    }
+}
+
+public class Wild_Active_Death : Wild_Active
+{
+	Wild_Character m_c_character;
+	Wild_Dungeon_Manager m_c_manager;
+	
+	/********** Method	**********/
+	public override void Wild_ActiveEnd()
+	{
+		m_c_manager.Wild_Tile_GetTile(m_c_character.Wild_Active_GetNowTile()).Wild_SetObject(null);
+		m_c_character.Wild_Active_SetNowTile(-1);
+		m_c_character.Wild_GetModel().SetActive(false);
+		m_c_character.Wild_Active_SettingSelActive(Wild_Character_Active_TYPE.IDLE);
+	}
+
+	//
+	public void Wild_InitAnother(Wild_Character _c_character, Wild_Dungeon_Manager _c_manager)
+	{
+		m_c_character = _c_character;
+		m_c_manager = _c_manager;
+	}
+
+	/********** Default Method	**********/
+	public override string[] Wild_Init(string _str)
+    {
+        base.Wild_Init(_str);
+
+        m_type = Wild_Character_Active_TYPE.DEATH;
+
+		return null;
+    }
+}
+
 public class Wild_Active_Attack : Wild_Active
 {
+	Wild_Character m_c_character;
+
 	Wild_Object m_target;
 
 	/********** Method	**********/
@@ -195,7 +263,31 @@ public class Wild_Active_Attack : Wild_Active
 	// 업데이트가 끝날 때마다 이벤트가 발생
 	public override void Wild_ActiveFrameEnd()
     {
+		if(m_c_character.Wild_Active_GetFrameCount() < m_l_motion_right.Count)
+		{
+			m_target.Wild_Damage(0);
+		}
     }
+
+	// 행동이 종료할 때 발생
+	public override void Wild_ActiveEnd()
+	{
+		if(	m_target.Wild_Active_GetActive().Wild_GetType().Equals(Wild_Character_Active_TYPE.IDLE) ||
+			(m_target.Wild_GetHp() <= 0) ||
+			// 오브젝트일 때
+			m_target.Wild_Active_GetActive().Equals(null))
+		{
+			Debug.Log("attack end");
+			m_target = null;
+			m_c_character.Wild_Active_SettingSelActive(Wild_Character_Active_TYPE.IDLE);
+		}
+	}
+
+	//
+	public void Wild_InitAnother(Wild_Character _c_character)
+	{
+		m_c_character = _c_character;
+	}
 
 	//
 	public void Wild_ActiveSetting(Wild_Object _target)
@@ -213,28 +305,7 @@ public class Wild_Active_Attack : Wild_Active
 		case "0":	m_type = Wild_Character_Active_TYPE.ATTACK_PUNCH;	break;
 		}
 
-		return null;
-    }
-}
-
-public class Wild_Active_Damage : Wild_Active
-{
-	Wild_Object m_target;
-
-	/********** Method	**********/
-
-	// 업데이트가 끝날 때마다 이벤트가 발생
-	public override void Wild_ActiveFrameEnd()
-    {
-
-    }
-
-	/********** Default Method	**********/
-	public override string[] Wild_Init(string _str)
-    {
-        base.Wild_Init(_str);
-
-        m_type = Wild_Character_Active_TYPE.DAMAGE;
+		m_target = null;
 
 		return null;
     }
@@ -407,11 +478,7 @@ public class Wild_Character : Wild_Object
     bool m_active_isRight;
 
 	/********** Getter & Setter	**********/
-
-	public override void Wild_Damage(int _damage)
-	{
-		Wild_Active_SettingSelActive(Wild_Character_Active_TYPE.DAMAGE);
-	}
+	public override Wild_Active Wild_Active_GetActive() { return m_active_l_active[m_active_selActive]; }
 
 	public int Wild_Active_GetActivePoint() { return m_active_activePoint; }
 
@@ -423,6 +490,8 @@ public class Wild_Character : Wild_Object
         m_active_animationTimer = temp;
     }
 
+	public int Wild_Active_GetFrameCount() { return m_active_frameCount; }
+
     public void Wild_Active_SetIsRight(bool _isRight) { m_active_isRight = _isRight; }
 
 	public Wild_Character_Active_TYPE Wild_Active_type() { return m_active_l_active[m_active_selActive].Wild_GetType(); }
@@ -430,22 +499,17 @@ public class Wild_Character : Wild_Object
 	public int Wild_Active_GetNowTile() { return m_active_nowTileNumber; }
 	public void Wild_Active_SetNowTile(int _nowTileNumber) { m_active_nowTileNumber = _nowTileNumber; }
 	/********** Method	**********/
+
+	public override void Wild_Damage(int _damage)
+	{
+		base.Wild_Damage(_damage);
+		Wild_Active_SettingSelActive(Wild_Character_Active_TYPE.DAMAGE);
+	}
+
 	public void Wild_Active_BattleStart()
 	{
 		m_active_activePoint = 0;
 		Wild_AStar_Setting();
-/*		if(m_number == 1)
-		{
-			for(int y = 0; y < (int)Wild_Map_SIZE.Y; y++)
-			{
-				string str = "";
-				for(int x = 0; x < (int)Wild_Map_SIZE.X; x++)
-				{
-					str += m_AStar_a_data[x + (y * (int)Wild_Map_SIZE.X)].m_distance + ", ";
-				}
-				Debug.Log( "Y : " + y + " / " +  str);
-			}
-		}*/
 		m_active_nowTileNumber = m_active_defaultTileNumber;
 		m_model.transform.position = m_c_manager.Wild_Tile_GetTile(m_active_nowTileNumber).Wild_GetPosition();
 	}
@@ -586,17 +650,29 @@ public class Wild_Character : Wild_Object
         m_active_isRight = true;
 
 		m_active_l_active = new List<Wild_Active>();
+		// init
 		Wild_Active_Idle idle = new Wild_Active_Idle();
 		idle.Wild_Init(_reader.ReadLine());
 		m_active_l_active.Add(idle);
-
+		// move
 		m_active_c_move = new Wild_Active_Move();
 		m_active_c_move.Wild_Init(_reader.ReadLine());
 		m_active_c_move.Wild_InitAnother(this, m_c_manager, m_model.transform);
 		m_active_l_active.Add(m_active_c_move);
-
+		// damage
+		Wild_Active_Damage damage = new Wild_Active_Damage();
+		damage.Wild_Init(_reader.ReadLine());
+		damage.Wild_InitAnother(this);
+		m_active_l_active.Add(damage);
+		// death
+		Wild_Active_Death death = new Wild_Active_Death();
+		death.Wild_Init(_reader.ReadLine());
+		death.Wild_InitAnother(this, m_c_manager);
+		m_active_l_active.Add(death);
+		// punch
 		m_active_c_attack_punch = new Wild_Active_Attack();
 		m_active_c_attack_punch.Wild_Init(_reader.ReadLine());
+		m_active_c_attack_punch.Wild_InitAnother(this);
 		m_active_l_active.Add(m_active_c_attack_punch);
 
 		Wild_Active_SettingSelActive(Wild_Character_Active_TYPE.IDLE);
@@ -610,7 +686,13 @@ public class Wild_Character : Wild_Object
 		active.Wild_ActiveAlways();
 
 		//
-		Wild_Motion motion = active.Wild_GetMotion(m_active_isRight, m_active_frameCount);
+		int frameCount = active.Wild_GetMotionCount(m_active_isRight) - 1;
+		if(m_active_frameCount < active.Wild_GetMotionCount(m_active_isRight))
+		{
+			frameCount = m_active_frameCount;
+		}
+
+		Wild_Motion motion = active.Wild_GetMotion(m_active_isRight, frameCount);
 
 		float aniTime = m_active_animationTimer;
 
@@ -629,11 +711,13 @@ public class Wild_Character : Wild_Object
 					aniTime = motion.Wild_GetStart();
 				}
                 else
-                    Wild_Active_SettingSelActive(Wild_Character_Active_TYPE.IDLE);
+				{
+					active.Wild_ActiveEnd();
+				}
             }
 			else
 			{
-				motion = active.Wild_GetMotion(m_active_isRight, m_active_frameCount);
+				motion = active.Wild_GetMotion(m_active_isRight, frameCount);
 				aniTime = motion.Wild_GetStart();
 			}
 		}
@@ -656,27 +740,6 @@ public class Wild_Character : Wild_Object
 
     //////////  //////////
     #region A-Star
-	/*
-    public enum Wild_AStar_CONDITION
-    {
-        NOSEARCH,
-        MOVE,
-        OBJECT,
-        OWN,
-        PLAYER,
-        ALLAIS,
-        ENEMY,
-        NOTMOVE
-    }
-
-    public struct Wild_AStar_Data
-    {
-        public int m_distance;
-
-        public Wild_AStar_CONDITION m_condition;
-    }
-    Wild_AStar_Data[] m_AStar_a_data;
-	*/
 
     List<int> m_AStar_l_settingTemp;
 
@@ -696,6 +759,12 @@ public class Wild_Character : Wild_Object
     {
         Wild_AStar_Reset();
 
+		// 죽어서 현재 타일에 없는가?
+		if(m_active_nowTileNumber.Equals(-1))
+		{
+			return;
+		}
+		
         // 자기 위치 셋팅
         {
             int temp = m_c_manager.Wild_FindMyTileNumber(this);

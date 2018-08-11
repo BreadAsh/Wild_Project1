@@ -43,7 +43,6 @@ public class Wild_UI_Btn : Wild_Touch_Area
 		m_number = _number;
 
 		// obj
-		//m_model = Object.Instantiate(Resources.Load<GameObject>("UI/Button"));
 		m_model = Object.Instantiate(Resources.Load<GameObject>("UI/Button2"));
 		m_a_vertex = new Transform[4];
 		m_a_vertex[0] = m_model.transform.Find("0");

@@ -26,6 +26,8 @@ public class Wild_Object
 
 	public GameObject Wild_GetModel() { return m_model; }
 
+	public int Wild_GetHp() { return m_hp; }
+
 	/********** Method	**********/
 
 	/********** Default Method	**********/
@@ -44,6 +46,8 @@ public class Wild_Object
 		m_type = _type;
 
 		m_AStar_a_data = null;
+
+		m_hp = 1;
 	}
 
 	public virtual void Wild_Release()
@@ -58,6 +62,9 @@ public class Wild_Object
 
     //////////  //////////
 	#region Active
+
+	/********** Getter & Setter	**********/
+	public virtual Wild_Active Wild_Active_GetActive() { return null; }
 
 	/********** Method	**********/
 	public virtual void Wild_Damage(int _damage)

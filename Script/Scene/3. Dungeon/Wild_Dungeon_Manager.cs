@@ -22,6 +22,7 @@ public class Wild_Dungeon_Manager : Wild_SceneManager
 {
 	//
 	Wild_Dungeon_Move m_c_move;
+	public GameObject m_ObjectCanvas;
 
 	/********** Getter & Setter	**********/
 
@@ -39,12 +40,12 @@ public class Wild_Dungeon_Manager : Wild_SceneManager
 
 		//
 		m_c_move = new Wild_Dungeon_Move();
-		m_c_move.Wild_Init(m_canvas);
-		m_c_move.Wild_Setting(this);
+		m_c_move.Wild_Init(m_UI_camera, m_UICanvas);
+		m_c_move.Wild_InitAnother(this);
 		m_l_UIManager.Add(m_c_move);
 
 		Wild_Dungeon_Battle c_battle = new Wild_Dungeon_Battle();
-		c_battle.Wild_Init(m_canvas);
+		c_battle.Wild_Init(this.GetComponent<Camera>(), m_ObjectCanvas);
 		c_battle.Wild_InitSetting(this);
 		m_l_UIManager.Add(c_battle);
 
@@ -71,6 +72,21 @@ public class Wild_Dungeon_Manager : Wild_SceneManager
 
 	/********** Getter & Setter	**********/
 	public Wild_Dungeon_Room Wild_Rooms_GetNowRoom() { return m_rooms_l_room[m_rooms_roomCount]; }
+
+	public Wild_Dungeon_Room Wild_Dungeon_GetRoomNumber(int _num)
+	{
+		Wild_Dungeon_Room res = null;
+
+		for(int i = 0; i < m_rooms_l_room.Count; i++)
+		{
+			if(m_rooms_l_room[i].Wild_GetNumber().Equals(_num))
+			{
+				res = m_rooms_l_room[i];
+			}
+		}
+
+		return res;
+	}
 
 	public int Wild_Rooms_GetDungeonX() { return m_rooms_dungeonX; }
 
@@ -160,7 +176,7 @@ public class Wild_Dungeon_Manager : Wild_SceneManager
 			{
 				case Wild_Dungeon_UI.Move:
 					{
-						m_c_move.Wild_SettingBtnActive(room.Wild_GetMoving());
+						m_c_move.Wild_SettingUI(room.Wild_GetMoving());
 					}
 					break;
 				case Wild_Dungeon_UI.Battle:
@@ -270,10 +286,10 @@ public class Wild_Dungeon_Manager : Wild_SceneManager
 	{
 		// 베이직 설정
 		m_tile_basic = Object.Instantiate(Resources.Load<GameObject>("Basic"));
-		m_tile_basic.transform.parent = m_canvas.transform;
+		m_tile_basic.transform.parent = m_ObjectCanvas.transform;
 		float screenY = Wild_Singleton_Screen.Wild_GetInstance().Wild_GetScreenSize().y;
-		m_tile_basic.transform.localPosition = new Vector3(0.0f, -screenY * 0.2f, 400.0f);
-		float scale = screenY / 10.0f * 0.8f;
+		m_tile_basic.transform.localPosition = new Vector3(0.0f, -screenY * 0.2f, 0.0f);
+		float scale = screenY / 10.0f * 0.6f;
 		m_tile_basic.transform.localScale = new Vector3(scale, scale, scale);
 
 		//
@@ -303,6 +319,10 @@ public class Wild_Dungeon_Manager : Wild_SceneManager
 	public int Wild_Player_GetCharacterListCount() { return m_player_l_characters.Count; }
 
 	/********** Method	**********/
+	public void Wild_Player_CharacterRemoveAt(int _num)
+	{
+		m_player_l_characters.RemoveAt(_num);
+	}
 
 	/********** Default Method	**********/
 	void Wild_Player_Init()
